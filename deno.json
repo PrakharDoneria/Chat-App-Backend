@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["deno.ns", "deno.window"],
+    "strict": true
+  },
+  "lint": {
+    "include": ["**/*.ts"],
+    "exclude": ["**/node_modules/**"]
+  },
+  "tasks": {
+    "start": "deno run --allow-net --allow-env --allow-read index.ts"
+  },
+  "importMap": "./import_map.json"
+}
