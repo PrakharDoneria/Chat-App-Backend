@@ -10,7 +10,6 @@ If you like this project and want to support its development, consider becoming 
 
 Your support helps us continue to improve and maintain the project.
 
-
 ## Endpoints
 
 ### 1. `/signup` - User Registration
@@ -240,12 +239,36 @@ Your support helps us continue to improve and maintain the project.
     }
     ```
 
+### 9. `/users-messaged` - Get Users Messaged
+
+- **Method**: `GET`
+- **Request**:
+  - **URL**: `/users-messaged?username=johndoe`
+
+- **Response**:
+  - **Success**:
+    ```json
+    [
+      {
+        "uid": "7264b2a4-d8d1-4264-8d8f-b2fa4b2a4048",
+        "lastMessage": "Hello, Jane!",
+        "timestamp": "2024-08-31T10:00:00.000Z"
+      }
+    ]
+    ```
+  - **Error** (User not found):
+    ```json
+    {
+      "error": "User not found"
+    }
+    ```
+
 ## Running the Server
 
 1. Ensure you have [Deno](https://deno.land/) installed.
 2. Run the server:
    ```sh
-   deno run --allow-net --allow-env --allow-read your-script-file.ts
+   deno run --allow-net --allow-env --allow-read --allow-write your-script-file.ts
    ```
 3. The server will start listening on port `8000`.
 

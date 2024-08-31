@@ -171,6 +171,38 @@ async function handleRemove(req: Request) {
   return new Response(JSON.stringify({ message: "User and all related data removed successfully" }), { status: 200 });
 }
 
+async function handleGetUsersMessaged(req: Request) {
+  const url = new URL(req.url);
+  const username = url.searchParams.get("username");
+
+  if (!username) {
+    return new Response(JSON.stringify({ error: "Username parameter is required" }), { status: 400 });
+  }
+
+  const messagedUsers = new Map<string, { message: string, timestamp: string }>();
+
+  for await (const entry of kv.list({ prefix: ["messages", "users", username] })) {
+    const [_, recipientId, timestamp] = entry.key;
+    const message = entry.value;
+
+    if (!messagedUsers.has(recipientId) || message.timestamp > messagedUsers.get(recipientId)!.timestamp) {
+      messagedUsers.set(recipientId, { message: message.message, timestamp: message.timestamp });
+    }
+  }
+
+  const response = [];
+  for (const [recipientId, lastMessage] of messagedUsers.entries()) {
+    const recipient = await kv.get(["users", "id", recipientId]);
+    response.push({
+      uid: recipient.value?.username || recipientId,
+      lastMessage: lastMessage.message,
+      timestamp: lastMessage.timestamp
+    });
+  }
+
+  return new Response(JSON.stringify(response), { status: 200 });
+}
+
 serve(async (req) => {
   const url = new URL(req.url);
 
@@ -190,6 +222,8 @@ serve(async (req) => {
     return await handleDelete(req);
   } else if (req.method === "POST" && url.pathname === "/remove") {
     return await handleRemove(req);
+  } else if (req.method === "GET" && url.pathname === "/users-messaged") {
+    return await handleGetUsersMessaged(req);
   }
 
   return new Response("Not Found", { status: 404 });
